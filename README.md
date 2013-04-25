@@ -3,5 +3,5 @@ DataflowAPI
 
 
 Run
-$ ./update_lib.sh
-$ make
+    $ ./update_lib.sh
+    $ make
