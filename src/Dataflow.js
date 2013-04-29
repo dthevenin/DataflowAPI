@@ -1,17 +1,17 @@
 /**
-  Copyright (C) 2009-2012. David Thevenin, ViniSketch SARL (c), and 
+  Copyright (C) 2009-2012. David Thevenin, ViniSketch SARL (c), and
   contributors. All rights reserved
-  
+
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published
   by the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   GNU Lesser General Public License for more details.
-  
+
   You should have received a copy of the GNU Lesser General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -20,7 +20,7 @@ function DataFlow ()
 {
   // ordered node list Array<Object>
   this.dataflow_node = [];
-  
+
   // edges from components Object[component.id] => Array[3] <Object, , properties>
   this.dataflow_edges = {};
   this.is_propagating = false;
@@ -36,12 +36,12 @@ DataFlow.prototype = {
       fnc_in, fnc_out,
       edge, obj_next, connectors, connector, l, ll;
     if (!edges) { return; }
-    
+
     l = edges.length;
     for (k = 0; k < l; k++) {
       edge = edges [k]; if (!edge) { continue; }
       obj_next = edge[0]; if (!obj_next) { continue; }
-      
+
       connectors = edge[2];
       if (connectors) {
         ll = connectors.length;
@@ -52,48 +52,48 @@ DataFlow.prototype = {
           fnc_out = connector [1];
           fnc_out.call (obj_next, fnc_in.call (obj));
         }
-        
+
         obj_next.__should__call__has__changed__ = true;
       }
     }
   },
-  
+
   propagate : function (obj)
   {
     if (this.is_propagating || this.__shouldnt_propagate__) { return; }
-    
+
     this.is_propagating = true;
-    
+
     var i = 0, l = this.dataflow_node.length;
     if (obj) {
       // find the first node corresponding to the id
       while (i < l && this.dataflow_node [i] !== obj) { i++; }
-    
+
       // the node wad found. First data propagation
       if (i < l - 1) {
         this.propagate_values (obj);
         i++;
       }
     }
-    
+
     // continue the propagation
     for (; i < l; i++)
     {
       obj = this.dataflow_node [i];
       if (!obj) { continue; }
-  
+
       if (obj.__should__call__has__changed__ && obj.propertiesDidChange) {
         obj.propertiesDidChange ();
         obj.__should__call__has__changed__ = false;
       }
-      
+
       this.propagate_values (obj);
     }
-    
+
     // end of propagation
     this.is_propagating = false;
   },
-  
+
   /**
    * @private
    */
@@ -101,7 +101,7 @@ DataFlow.prototype = {
   {
     this.__shouldnt_propagate__ ++;
   },
-  
+
   /**
    * @private
    */
@@ -116,7 +116,7 @@ DataFlow.prototype = {
     if (!data) { return; }
     this._ref_node = data;
   },
-  
+
   register_ref_edges : function (data)
   {
     if (!data) { return; }
