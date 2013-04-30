@@ -41,7 +41,7 @@ util.defineClassProperties (vs.ui.View, {
 
   'opacity': {
     set : function (v) {
-      this.view.style.opacity = v;
+      if (this.view) this.view.style.opacity = v;
       _opacity = v;
     }
   }
@@ -118,7 +118,7 @@ var Animations = vs.core.createClass ({
 
   configDataflow: function () {
   
-    //  Animate Google Color log
+    // Animate Google Color log
     var trajPos = new Vector2D ({values: [[0,0], [0, 90]]}).init ();
     var trajScale = new Vector1D ({values: [1, 1.3]}).init ();
     var trajOpacity = new Vector1D ({values: [0, 1]}).init ();
@@ -130,24 +130,24 @@ var Animations = vs.core.createClass ({
     this.dataflow.connect (trajScale, "out", this.logoImageColor, "scaling");
     this.dataflow.connect (trajOpacity, "out", this.logoImageColor, "opacity");    
     
-    //  Animate Google White logo
+    // Animate Google White logo
     var trajOpacityTer = new Vector1D ({values: [1, 0]}).init ();
     this.dataflow.connect (this.slider, "value", trajOpacityTer, "tick");
     this.dataflow.connect (trajPos, "out", this.logoImageWhite, "translation");
     this.dataflow.connect (trajScale, "out", this.logoImageWhite, "scaling");
     this.dataflow.connect (trajOpacityTer, "out", this.logoImageWhite, "opacity");    
 
-    //  Animate search field
+    // Animate search field
     var trajPosBis = new Vector2D ({values: [[0,0], [0, 90]]}).init ();
     this.dataflow.connect (this.slider, "value", trajPosBis, "tick");
     this.dataflow.connect (trajPosBis, "out", this.searchInput, "translation");
 
-    //  Animate short cuts
+    // Animate short cuts
     var trajOpacityBis = new Vector1D ({values: [0, 1]}).init ();
     this.dataflow.connect (this.slider, "value", trajOpacityBis, "tick");
     this.dataflow.connect (trajOpacityBis, "out", this.shortCuts, "opacity");
    
-    //  Animate background image
+    // Animate background image
     this.dataflow.connect (trajOpacityTer, "out", this.backImage, "opacity");
 
     // Compile the dataflow
