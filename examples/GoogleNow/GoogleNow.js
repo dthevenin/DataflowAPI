@@ -100,7 +100,7 @@ var Animations = vs.core.createClass ({
   buildGoogleSearchView : function () {
 
     this.logoImageColor = new vs.ui.ImageView ({
-      src : "assets/Google_logo_color.png",
+      src : "assets/google_logo_color.png",
       position: [70, 40],
       size: [180, 60],
     }).init ();
