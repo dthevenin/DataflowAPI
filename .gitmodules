@@ -1,6 +1,6 @@
 [submodule "ext/VSToolkit"]
 	path = ext/VSToolkit
-	url = git@github.com:vinisketch/VSToolkit.git
+	url = https://github.com/vinisketch/VSToolkit.git
 [submodule "ext/AnimatedTransition"]
 	path = ext/AnimatedTransition
-	url = git@github.com:dthevenin/AnimatedTransition.git
+	url = https://github.com/dthevenin/AnimatedTransition.git
