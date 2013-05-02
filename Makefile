@@ -62,3 +62,5 @@ lib/dataflow.js:
 	$(CAT) src/Dataflow.js >> $@
 	$(CAT) src/vst_extension.js >> $@
 	
+update: 
+	git submodule -q foreach git pull -q origin master

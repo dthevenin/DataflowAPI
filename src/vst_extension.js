@@ -1,6 +1,18 @@
 var VSObject = vs.core.Object;
-
 DataFlow.prototype.build = function ()
+{
+  this._sort ()
+
+  this._ref_edges = this._edges_from;
+  this._ref_node = this._list_node;
+  
+  this._data_optimize ();
+  
+  this._ref_edges = undefined;
+  this._ref_node = undefined;
+};
+
+DataFlow.prototype._data_optimize = function ()
 {
   if (!this._ref_node || !this._ref_edges) { return; }
   
@@ -65,6 +77,20 @@ DataFlow.prototype.build = function ()
 };
 
 var _df_node_to_def = {};
+
+
+DataFlow.prototype.register_ref_node = function (data)
+{
+  if (!data) { return; }
+  this._ref_node = data;
+},
+
+DataFlow.prototype.register_ref_edges = function (data)
+{
+  if (!data) { return; }
+  this._ref_edges = data;
+}
+
 
 function _df_create (id, ref)
 {
