@@ -3,6 +3,17 @@ html {
   height: 100%;
 }
 
+body {
+  background-color: #333;
+}
+
+#googleView {
+  width: 320px;
+  height: 520px;
+  background-color: white;
+  overflow: visible;
+}
+
 .vs_ui_inputfield {
   border-radius: 0px;
   box-shadow: none;

@@ -57,6 +57,13 @@ var Animations = vs.core.createClass ({
 
     this.dataflow = new DataFlow ();
     _default_df_ = this.dataflow;
+        
+    this.googleView = new vs.ui.View ({
+      id:'googleView',
+      layout: vs.ui.View.ABSOLUTE_LAYOUT,
+      magnet: 5
+    }).init ();
+    this.add (this.googleView);
     
     this.slider = new vs.ui.Slider ({
       orientation: vs.ui.Slider.VERTICAL,
@@ -64,7 +71,7 @@ var Animations = vs.core.createClass ({
       position: [350, 40],
       size: [10, 300]
     }).init ();
-    this.add (this.slider);
+    this.googleView.add (this.slider);
     
     this.buildGoogleNowView ();
     this.buildGoogleSearchView ();
@@ -79,7 +86,7 @@ var Animations = vs.core.createClass ({
       size: [320, 200]
     }).init ();
     
-    this.add (this.backImage);
+    this.googleView.add (this.backImage);
 
     this.logoImageWhite = new vs.ui.ImageView ({
       src : "assets/google_logo_white.png",
@@ -87,7 +94,7 @@ var Animations = vs.core.createClass ({
       size: [180, 60]
     }).init ();
     
-    this.add (this.logoImageWhite);
+    this.googleView.add (this.logoImageWhite);
   },
 
   buildGoogleSearchView : function () {
@@ -98,14 +105,14 @@ var Animations = vs.core.createClass ({
       size: [180, 60],
     }).init ();
     
-    this.add (this.logoImageColor);
+    this.googleView.add (this.logoImageColor);
 
     this.searchInput = new vs.ui.InputField ({
       position: [20, 120],
       size: [280, 40],
     }).init ();
     
-    this.add (this.searchInput);
+    this.googleView.add (this.searchInput);
     
     this.shortCuts = new vs.ui.View ({
       position: [10, 340],
@@ -113,7 +120,7 @@ var Animations = vs.core.createClass ({
       layout: vs.ui.View.HORIZONTAL_LAYOUT
     }).init ();
     
-    this.add (this.shortCuts);
+    this.googleView.add (this.shortCuts);
   },
 
   configDataflow: function () {
