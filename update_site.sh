@@ -8,4 +8,5 @@ mv tmp/lib .
 mv tmp/examples .
 rm -rf tmp
 
+git submodule -q foreach git pull -q origin master
 rsync -pvtrlL --exclude=.svn/ data/ examples
