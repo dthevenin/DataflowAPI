@@ -61,7 +61,7 @@ var Animations = vs.core.createClass ({
     this.googleView = new vs.ui.View ({
       id:'googleView',
       layout: vs.ui.View.ABSOLUTE_LAYOUT,
-      magnet: 5
+      magnet: vs.ui.View.MAGNET_CENTER
     }).init ();
     this.add (this.googleView);
     
