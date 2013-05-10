@@ -18,6 +18,6 @@ You can run some [Demos](http://dthevenin.github.io/DataflowAPI/).
 Authors
 -------
 
-David Thevenin
+David Thevenin  
+Eric Bréchemier  
 
-Eric Bréchemier
