@@ -16,8 +16,14 @@ DataFlow.prototype._data_optimize = function ()
 {
   if (!this._ref_node || !this._ref_edges) { return; }
   
-  var temp = [], i, ref, edges, edges_temp, edge, edge_temp,
-    cid_src, cid_trg, obj_src, obj_trg;
+  var temp = [], i, j, k, ref,
+    data, data_temp,
+    connections, connections_temp,
+    edges, edges_temp,
+    edge, edge_temp,
+    cid_src, cid_trg, obj_src, obj_trg,
+    property_name, descriptor, properties, properties_temp;
+    
   for (i = 0; i < this._ref_node.length; i++)
   {
     ref = this._ref_node [i];
@@ -38,40 +44,56 @@ DataFlow.prototype._data_optimize = function ()
    
     obj_src = VSObject._obs [cid_src]; if (!obj_src) { continue; }
 
-    edges = this._ref_edges [ref];
-    edges_temp = [];
-    for (i = 0; i < edges.length; i++) {
-      edge = edges [i];
-      edge_temp = [3];
+    data = this._ref_edges [ref];
+    data_temp = [];
+    temp [cid_src] = data_temp;
+    
+    if (data) for (i = 0; i < data.length; i++) {
+      connections = data [i];
+      connections_temp = [3];
+      data_temp.push (connections_temp);
       
-      cid_trg = this._node_link [edge [0]];
-      if (!cid_trg) { cid_trg = edge [0]; }
+      cid_trg = this._node_link [connections [0]];
+      if (!cid_trg) { cid_trg = connections [0]; }
       obj_trg = VSObject._obs [cid_trg];  if (!obj_trg) { continue; }
       
-      edge_temp [0] = obj_trg;
-      edge_temp [1] = edge [1];
+      connections_temp [0] = obj_trg;
+      connections_temp [1] = connections [1];
       
-      var properties = [];
-      var connectors = edge [2];
-      for (j = 0; j < connectors.length; j++)
+      edges = connections [2];
+      edges_temp = [];
+      connections_temp [2] = edges_temp;
+      
+      for (j = 0; j < edges.length; j++)
       {
-        var prop_in = connectors [j][0];
-        var prop_out = connectors [j][1]; 
-                
-        var desc_out = obj_trg.getPropertyDescriptor (prop_out);
-        var desc_in = obj_src.getPropertyDescriptor (prop_in);
+        edge = edges [j];
+        edge_temp = [4];
+        edges_temp.push (edge_temp);
 
-        if (!desc_in || !desc_in.get) { continue; }
-        if (!desc_out || !desc_out.set) { continue; }
+        edge_temp [0] = edge [0]; // id copy
+        if (util.isFunction (edge [3])) edge_temp [3] = edge [3]; // function copy
         
-        properties.push ([desc_in.get, desc_out.set]);
-      }
-      edge_temp [2] = properties;
+        properties = edge [1], properties_temp = []; // manage out properties
+        for (k = 0; k < properties.length; k++)
+        {
+          property_name = properties [k];
+          descriptor = obj_src.getPropertyDescriptor (property_name);
+          if (!descriptor || !descriptor.get) { continue; }
+          properties_temp.push (descriptor.get);
+        }
+        edge_temp [1] = properties_temp;
       
-      edges_temp.push (edge_temp);
+        properties = edge [2], properties_temp = []; // manage out properties
+        for (k = 0; k < properties.length; k++)
+        {
+          property_name = properties [k];
+          descriptor = obj_trg.getPropertyDescriptor (property_name);
+          if (!descriptor || !descriptor.set) { continue; }
+          properties_temp.push (descriptor.set);
+        }
+        edge_temp [2] = properties_temp;
+      }
     }
-    
-    temp [cid_src] = edges_temp;
   }
   this.dataflow_edges = temp;
 };
