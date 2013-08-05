@@ -45,6 +45,12 @@ var Animations = vs.core.createClass ({
     this.testOrder1 ();
     this.testOrder2 ();
     this.testCycle ();
+    this.testPropagation1 ();
+    this.testPropagation2 ();
+    this.testPropagation3 ();
+    this.testFunction1 ();
+    this.testFunction2 ();
+    this.testFunction3 ();
     this.testAPIAnimation ();
   },
 
@@ -63,7 +69,6 @@ var Animations = vs.core.createClass ({
 
     vs._df_register_ref_edges (_df_id, edges);
     vs._df_build (_df_id);
-
 
     _default_df_ = _df_node_to_def [_df_id];
 
@@ -123,7 +128,6 @@ var Animations = vs.core.createClass ({
       }
     });
 
-
     var item1 = new TestObject ().init ();
     item1.propertiesDidChange = function () { console.log ('item1') }
     var item2 = new TestObject ().init ();
@@ -158,7 +162,6 @@ var Animations = vs.core.createClass ({
         "out": vs.core.Object.PROPERTY_OUT
       }
     });
-
 
     var item1 = new TestObject ().init ();
     item1.propertiesDidChange = function () { console.log ('item1') }
@@ -195,7 +198,6 @@ var Animations = vs.core.createClass ({
       }
     });
 
-
     var item1 = new TestObject ().init ();
     item1.propertiesDidChange = function () { console.log ('item1') }
     var item2 = new TestObject ().init ();
@@ -220,6 +222,326 @@ var Animations = vs.core.createClass ({
     item1['in'] = "huhu";
   },
 
+  testPropagation1 : function () {
+
+    var TestObject = vs.core.createClass ({
+
+      parent: vs.core.Object,
+
+      properties : {
+        "inOut1": vs.core.Object.PROPERTY_IN_OUT,
+        "inOut2": vs.core.Object.PROPERTY_IN_OUT
+      }
+    });
+
+    var item1 = new TestObject ().init ();
+    var item2 = new TestObject ().init ();
+//     item2.propertiesDidChange = function () {
+//       console.log ("Propagation item2");
+//       console.log (this._in_out1);
+//       console.log (this._in_out2);
+//     }
+    var item3 = new TestObject ().init ();
+//     item3.propertiesDidChange = function () {
+//       console.log ("Propagation item3");
+//       console.log (this._in_out1);
+//       console.log (this._in_out2);
+//     }
+    
+    var df = new DataFlow ();
+    _default_df_ = df;
+    
+    df.connect (item1, "inOut1", item2, "inOut1")
+    df.connect (item1, "inOut2", item2, "inOut2")
+
+    df.connect (item2, "inOut1", item3, "inOut1")
+    df.connect (item2, "inOut2", item3, "inOut2")
+
+    df.build ();
+
+    df.pausePropagation ();
+    item1['inOut1'] = 1;
+    item1['inOut2'] = 2;
+    df.restartPropagation ();
+    
+    df.propagate ();
+
+    if (item1._in_out1 === 1 && item1._in_out2 === 2 &&
+      item2._in_out1 === 1 && item2._in_out2 === 2 &&
+      item3._in_out1 === 1 && item3._in_out2 === 2)
+        console.log ("testPropagation1 OK");
+    else
+        console.log ("testPropagation1 NOT OK");
+
+    if (item1._in_out1 !== 1) console.log ("ERROR item1._in_out1");
+    if (item1._in_out2 !== 2) console.log ("ERROR item1._in_out2");
+    if (item2._in_out1 !== 1) console.log ("ERROR item2._in_out1");
+    if (item2._in_out2 !== 2) console.log ("ERROR item2._in_out2");
+    if (item3._in_out1 !== 1) console.log ("ERROR item3._in_out1");
+    if (item3._in_out2 !== 2) console.log ("ERROR item3._in_out2");
+  },
+
+  testPropagation2 : function () {
+
+    var TestObject = vs.core.createClass ({
+
+      parent: vs.core.Object,
+
+      properties : {
+        "inOut1": vs.core.Object.PROPERTY_IN_OUT,
+        "inOut2": vs.core.Object.PROPERTY_IN_OUT
+      }
+    });
+
+    var item1 = new TestObject ().init ();
+    var item2 = new TestObject ().init ();
+//     item2.propertiesDidChange = function () {
+//       console.log ("Propagation item2");
+//       console.log (this._in_out1);
+//       console.log (this._in_out2);
+//     }
+    var item3 = new TestObject ().init ();
+//     item3.propertiesDidChange = function () {
+//       console.log ("Propagation item3");
+//       console.log (this._in_out1);
+//       console.log (this._in_out2);
+//     }
+    
+    var df = new DataFlow ();
+    _default_df_ = df;
+    
+    df.connect (item1, ["inOut1", "inOut2"], item2, ["inOut1", "inOut2"]);
+    df.connect (item2, ["inOut1", "inOut2"], item3, ["inOut1", "inOut2"]);
+
+    df.build ();
+
+    df.pausePropagation ();
+    item1['inOut1'] = 1;
+    item1['inOut2'] = 2;
+    df.restartPropagation ();
+    
+    df.propagate ();
+    
+    if (item1._in_out1 === 1 && item1._in_out2 === 2 &&
+      item2._in_out1 === 1 && item2._in_out2 === 2 &&
+      item3._in_out1 === 1 && item3._in_out2 === 2)
+        console.log ("testPropagation2 OK");
+    else
+        console.log ("testPropagation2 NOT OK");
+
+    if (item1._in_out1 !== 1) console.log ("ERROR item1._in_out1");
+    if (item1._in_out2 !== 2) console.log ("ERROR item1._in_out2");
+    if (item2._in_out1 !== 1) console.log ("ERROR item2._in_out1");
+    if (item2._in_out2 !== 2) console.log ("ERROR item2._in_out2");
+    if (item3._in_out1 !== 1) console.log ("ERROR item3._in_out1");
+    if (item3._in_out2 !== 2) console.log ("ERROR item3._in_out2");
+  },
+
+  testPropagation3 : function () {
+
+    var TestObject = vs.core.createClass ({
+
+      parent: vs.core.Object,
+
+      properties : {
+        "in": vs.core.Object.PROPERTY_IN,
+        "out": vs.core.Object.PROPERTY_OUT
+      },
+      
+      propertiesDidChange : function () {
+        this._out = this._in + 1;
+      }
+    });
+
+    var item1 = new TestObject ().init ();
+    var item2 = new TestObject ().init ();
+    var item3 = new TestObject ().init ();
+    
+    var df = new DataFlow ();
+    _default_df_ = df;
+    
+    df.connect (item1, ["out"], item2, ["in"]);
+    df.connect (item2, ["out"], item3, ["in"]);
+
+    df.build ();
+
+    item1['in'] = 1;
+    
+    if (item1._in === 1 && item1._out === 2 &&
+      item2._in === 2 && item2._out === 3 &&
+      item3._in === 3 && item3._out === 4)
+        console.log ("testPropagation3 OK");
+    else
+        console.log ("testPropagation3 NOT OK");
+
+    if (item1._in !== 1) console.log ("ERROR item1._in");
+    if (item1._out !== 2) console.log ("ERROR item1._out");
+    if (item2._in !== 2) console.log ("ERROR item2._in");
+    if (item2._out !== 3) console.log ("ERROR item2._out");
+    if (item3._in !== 3) console.log ("ERROR item3._in");
+    if (item3._out !== 4) console.log ("ERROR item3._out");
+  },
+
+  testFunction1 : function () {
+
+    var TestObject = vs.core.createClass ({
+
+      parent: vs.core.Object,
+
+      properties : {
+        "inOut": vs.core.Object.PROPERTY_IN_OUT
+      }
+    });
+
+    var item1 = new TestObject ().init ();
+    var item2 = new TestObject ().init ();
+    var item3 = new TestObject ().init ();
+    var item4 = new TestObject ().init ();
+    var item5 = new TestObject ().init ();
+
+    var df = new DataFlow ();
+    _default_df_ = df;
+
+    var foisDeux = function (v) {
+      return v * 2
+    };
+    var foisTrois = function (v) {
+      return v * 3
+    };
+    
+    df.connect (item1, "inOut", item2, "inOut", foisDeux)
+    df.connect (item2, "inOut", item3, "inOut", foisDeux)
+    df.connect (item3, "inOut", item4, "inOut", foisTrois)
+    df.connect (item4, "inOut", item5, "inOut", foisTrois)
+    df.build ();
+
+    item1['inOut'] = 1;
+    
+    if (item1._in_out === 1 && item2._in_out === 2 &&
+      item3._in_out === 4 && item4._in_out === 12 &&
+      item5._in_out === 36)
+      console.log ("testFunction1 OK");
+    else
+      console.log ("testFunction1 NOT OK");
+    
+    if (item1._in_out !== 1) console.log ("ERROR item1._in_out");
+    if (item2._in_out !== 2) console.log ("ERROR item2._in_out");
+    if (item3._in_out !== 4) console.log ("ERROR item3._in_out");
+    if (item4._in_out !== 12) console.log ("ERROR item4._in_out");
+    if (item5._in_out !== 36) console.log ("ERROR item5._in_out");
+  },
+
+  testFunction2 : function () {
+
+    var TestObject = vs.core.createClass ({
+
+      parent: vs.core.Object,
+
+      properties : {
+        "inOut1": vs.core.Object.PROPERTY_IN_OUT,
+        "inOut2": vs.core.Object.PROPERTY_IN_OUT
+      }
+    });
+
+    var item1 = new TestObject ().init ();
+    var item2 = new TestObject ().init ();
+    var item3 = new TestObject ().init ();
+    
+    var func = function (v1, v2) {
+      return [v2 * 2, v1 * 3];
+    };
+
+    var df = new DataFlow ();
+    _default_df_ = df;
+    
+    df.connect (item1, ["inOut1", "inOut2"], item2, ["inOut1", "inOut2"], func);
+    df.connect (item2, ["inOut1", "inOut2"], item3, ["inOut1", "inOut2"], func);
+
+    df.build ();
+
+    df.pausePropagation ();
+    item1['inOut1'] = 1;
+    item1['inOut2'] = 2;
+    df.restartPropagation ();
+    
+    df.propagate ();
+
+    if (item1._in_out1 === 1 && item1._in_out2 === 2 &&
+      item2._in_out1 === 4 && item2._in_out2 === 3 &&
+      item3._in_out1 === 6 && item3._in_out2 === 12)
+        console.log ("testFunction2 OK");
+    else
+        console.log ("testFunction2 NOT OK");
+
+    if (item1._in_out1 !== 1) console.log ("ERROR item1._in_out1");
+    if (item1._in_out2 !== 2) console.log ("ERROR item1._in_out2");
+    if (item2._in_out1 !== 4) console.log ("ERROR item2._in_out1");
+    if (item2._in_out2 !== 3) console.log ("ERROR item2._in_out2");
+    if (item3._in_out1 !== 6) console.log ("ERROR item3._in_out1");
+    if (item3._in_out2 !== 12) console.log ("ERROR item3._in_out2");
+  },
+
+  testFunction3 : function () {
+
+    var TestObject1 = vs.core.createClass ({
+
+      parent: vs.core.Object,
+
+      properties : {
+        "inOut1": vs.core.Object.PROPERTY_IN_OUT,
+        "inOut2": vs.core.Object.PROPERTY_IN_OUT
+      }
+    });
+
+    var TestObject2 = vs.core.createClass ({
+
+      parent: vs.core.Object,
+
+      properties : {
+        "inOut": vs.core.Object.PROPERTY_IN_OUT
+      }
+    });
+
+    var item1 = new TestObject1 ().init ();
+    var item2 = new TestObject2 ().init ();
+    var item3 = new TestObject1 ().init ();
+    
+    var func1 = function (v1, v2) {
+      return v1 * v2;
+    };
+    var func2 = function (v) {
+      return [v * 2, v * 3];
+    };
+
+    var df = new DataFlow ();
+    _default_df_ = df;
+    
+    df.connect (item1, ["inOut1", "inOut2"], item2, "inOut", func1);
+    df.connect (item2, "inOut", item3, ["inOut1", "inOut2"], func2);
+
+    df.build ();
+
+    df.pausePropagation ();
+    item1['inOut1'] = 1;
+    item1['inOut2'] = 2;
+    df.restartPropagation ();
+    
+    df.propagate ();
+
+    if (item1._in_out1 === 1 && item1._in_out2 === 2 &&
+      item2._in_out === 2 &&
+      item3._in_out1 === 4 && item3._in_out2 === 6)
+        console.log ("testFunction3 OK");
+    else
+        console.log ("testFunction3 NOT OK");
+
+    if (item1._in_out1 !== 1) console.log ("ERROR item1._in_out1");
+    if (item1._in_out2 !== 2) console.log ("ERROR item1._in_out2");
+    if (item2._in_out !== 2) console.log ("ERROR item2._in_out");
+    if (item3._in_out1 !== 4) console.log ("ERROR item3._in_out1");
+    if (item3._in_out2 !== 6) console.log ("ERROR item3._in_out2");
+  },
+
   testAPIAnimation : function () {
 
     var item1 = this.item1;
@@ -228,7 +550,7 @@ var Animations = vs.core.createClass ({
     var animOptions = {
       duration: 1000,
       pace: Pace.getEaseOutPace (),
-      // steps: 10,
+ //     steps: 10,
       repeat: 10
     }
 
@@ -239,12 +561,13 @@ var Animations = vs.core.createClass ({
     var df = new DataFlow ();
     _default_df_ = df;
 
-    df.connect (chrono, "tick", pace, "tickIn")
-    df.connect (traj, "out", item1, "position")
-    df.connect (item1, "position", item2, "position")
-    df.connect (pace, "tickOut", traj, "tick")
+   df.connect (chrono, "tick", pace, "tickIn")
+   df.connect (pace, "tickOut", traj, "tick")
+   df.connect (traj, "out", item1, "position")
+   df.connect (item1, "position", item2, "position")
     df.build ();
 
+//    console.profile ()
     chrono.start ();
   },
 });
