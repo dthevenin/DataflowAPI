@@ -16,3 +16,21 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+var Connector = function (object, property_out) {
+  this.object = object;
+  this.property_out = property_out;
+}
+
+Connector.prototype.to = function (object, property_in) {
+  vs._default_df_.connect (this.object, this.property_out, object, property_in);
+  
+  return this;
+}
+
+Connector.prototype.connect = function (property_out) {
+  return new Connector (this.object, property_out);
+}
+
+vs.core.Object.prototype.connect = function (property_out) {
+  return new Connector (this, property_out);
+}
