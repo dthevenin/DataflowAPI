@@ -26,8 +26,6 @@ var Animations = vs.core.createClass ({
   initComponent : function () {
     this._super ();
 
-    this.dataflow = new DataFlow ();
-
     window.item1 = this.item1 = new vs.ui.TextLabel ({id: 'item1', text: '1'}).init ();
     this.add (this.item1);
 
@@ -42,15 +40,16 @@ var Animations = vs.core.createClass ({
     this.item1.translation = [20, 20];
     this.item2.translation = [20, 120];
 
-    this.testOrder1 ();
-    this.testOrder2 ();
-    this.testCycle ();
-    this.testPropagation1 ();
-    this.testPropagation2 ();
-    this.testPropagation3 ();
-    this.testFunction1 ();
-    this.testFunction2 ();
-    this.testFunction3 ();
+//    this.testOrder1 ();
+//     this.testOrder2 ();
+//     this.testCycle ();
+//     this.testPropagation1 ();
+//     this.testPropagation2 ();
+//     this.testPropagation3 ();
+//     this.testFunction1 ();
+//     this.testFunction2 ();
+//     this.testFunction3 ();
+    testCycleBis ();
     this.testAPIAnimation ();
   },
 
@@ -139,8 +138,7 @@ var Animations = vs.core.createClass ({
     var item5 = new TestObject ().init ();
     item5.propertiesDidChange = function () { console.log ('item5') }
 
-    var df = new DataFlow ();
-    _default_df_ = df;
+    var df = vs._default_df_;
 
     df.connect (item1, "out", item2, "in")
     df.connect (item2, "out", item3, "in")
@@ -174,8 +172,7 @@ var Animations = vs.core.createClass ({
     var item5 = new TestObject ().init ();
     item5.propertiesDidChange = function () { console.log ('item5') }
 
-    var df = new DataFlow ();
-    _default_df_ = df;
+    var df = vs._default_df_;
 
     df.connect (item1, "out", item2, "in")
     df.connect (item4, "out", item5, "in")
@@ -199,7 +196,9 @@ var Animations = vs.core.createClass ({
     });
 
     var item1 = new TestObject ().init ();
-    item1.propertiesDidChange = function () { console.log ('item1') }
+    item1.propertiesDidChange = function () {
+      console.log ('item1');
+    }
     var item2 = new TestObject ().init ();
     item2.propertiesDidChange = function () { console.log ('item2') }
     var item3 = new TestObject ().init ();
@@ -209,8 +208,7 @@ var Animations = vs.core.createClass ({
     var item5 = new TestObject ().init ();
     item5.propertiesDidChange = function () { console.log ('item5') }
 
-    var df = new DataFlow ();
-    _default_df_ = df;
+    var df = vs._default_df_;
 
     df.connect (item1, "out", item2, "in")
     df.connect (item2, "out", item3, "in")
@@ -248,8 +246,7 @@ var Animations = vs.core.createClass ({
 //       console.log (this._in_out2);
 //     }
     
-    var df = new DataFlow ();
-    _default_df_ = df;
+    var df = vs._default_df_;
     
     df.connect (item1, "inOut1", item2, "inOut1")
     df.connect (item1, "inOut2", item2, "inOut2")
@@ -307,8 +304,7 @@ var Animations = vs.core.createClass ({
 //       console.log (this._in_out2);
 //     }
     
-    var df = new DataFlow ();
-    _default_df_ = df;
+    var df = vs._default_df_;
     
     df.connect (item1, ["inOut1", "inOut2"], item2, ["inOut1", "inOut2"]);
     df.connect (item2, ["inOut1", "inOut2"], item3, ["inOut1", "inOut2"]);
@@ -357,8 +353,7 @@ var Animations = vs.core.createClass ({
     var item2 = new TestObject ().init ();
     var item3 = new TestObject ().init ();
     
-    var df = new DataFlow ();
-    _default_df_ = df;
+    var df = vs._default_df_;
     
     df.connect (item1, ["out"], item2, ["in"]);
     df.connect (item2, ["out"], item3, ["in"]);
@@ -399,8 +394,7 @@ var Animations = vs.core.createClass ({
     var item4 = new TestObject ().init ();
     var item5 = new TestObject ().init ();
 
-    var df = new DataFlow ();
-    _default_df_ = df;
+    var df = vs._default_df_;
 
     var foisDeux = function (v) {
       return v * 2
@@ -451,8 +445,7 @@ var Animations = vs.core.createClass ({
       return [v2 * 2, v1 * 3];
     };
 
-    var df = new DataFlow ();
-    _default_df_ = df;
+    var df = vs._default_df_;
     
     df.connect (item1, ["inOut1", "inOut2"], item2, ["inOut1", "inOut2"], func);
     df.connect (item2, ["inOut1", "inOut2"], item3, ["inOut1", "inOut2"], func);
@@ -513,8 +506,7 @@ var Animations = vs.core.createClass ({
       return [v * 2, v * 3];
     };
 
-    var df = new DataFlow ();
-    _default_df_ = df;
+    var df = vs._default_df_;
     
     df.connect (item1, ["inOut1", "inOut2"], item2, "inOut", func1);
     df.connect (item2, "inOut", item3, ["inOut1", "inOut2"], func2);
@@ -558,8 +550,7 @@ var Animations = vs.core.createClass ({
     var pace = Pace.getEaseOutPace ();
     var traj = new Vector2D ({values: [[0,0], [200, 50], [0, 0]]}).init ();
 
-    var df = new DataFlow ();
-    _default_df_ = df;
+    var df = vs._default_df_;
 
    df.connect (chrono, "tick", pace, "tickIn")
    df.connect (pace, "tickOut", traj, "tick")
@@ -608,3 +599,34 @@ function test () {
   }
   console.log ('t3: ' + (Date.now () - t));
 }
+
+
+function testCycleBis () {
+
+  var TestObject = vs.core.createClass ({
+
+    properties : {
+      "in": vs.core.Object.PROPERTY_IN,
+      "out": vs.core.Object.PROPERTY_OUT
+    }
+  });
+
+  var item1 = new TestObject ().init ();
+  item1.propertiesDidChange = function () {
+    console.log ('item1');
+    return true
+  }
+  var item2 = new TestObject ().init ();
+  item2.propertiesDidChange = function () {
+    console.log ('item2');
+    return true
+  }
+
+  var df = vs._default_df_;
+
+  df.connect (item1, "out", item2, "in")
+  df.connect (item2, "out", item1, "in")
+  df.build ();
+
+  item1['in'] = "huhu";
+};

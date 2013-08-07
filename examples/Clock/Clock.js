@@ -16,8 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var _default_df_;
-
 var Clock = vs.core.createClass ({
 
   /** parent class */
@@ -26,8 +24,7 @@ var Clock = vs.core.createClass ({
   initComponent : function () {
     this._super ();
 
-    var dataflow = new DataFlow ();
-    _default_df_ = dataflow;
+    var dataflow = vs._default_df_;
     
     var clockView = new MyClock ().init ()
     this.add (clockView)
@@ -39,21 +36,23 @@ var Clock = vs.core.createClass ({
      }).init ();
     var trajMinute = new Vector1D ({values: [0, 59]}).init ();
 
-    dataflow.connect (chronoMinute, "tick", trajMinute, "tick");
-    dataflow.connect (trajMinute, "out", clockView, "minute");
 
     var chronoHour = new Chronometer ({
       duration: 10000,
       pace: Pace.getEaseOutPace ()
     }).init ();
     var trajHour = new Vector1D ({values: [0, 23]}).init ();
-
-    dataflow.connect (chronoHour, "tick", trajHour, "tick");
-    dataflow.connect (trajHour, "out", clockView, "hour");
-
-    // Compile the dataflow
-    dataflow.build ();
     
+    chronoMinute
+      .connect ("tick").to (trajMinute, "tick");
+    trajMinute
+     .connect ("out").to (clockView, "minute");
+
+    chronoHour
+      .connect ("tick").to (trajHour, "tick");
+    trajHour
+      .connect ("out").to (clockView, "hour")
+
     this.clockChrono = vs.par (chronoMinute, chronoHour);
   },
 
@@ -66,4 +65,7 @@ function loadApplication () {
   new Clock ({id:"animations", layout:vs.ui.View.ABSOLUTE_LAYOUT}).init ();
 
   vs.ui.Application.start ();
+    
+  // Compile the dataflow
+  vs._default_df_.build ();
 }

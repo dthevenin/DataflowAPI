@@ -16,8 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var _default_df_;
-
 var iconsTemplate =
 "<div class='shortcuts vs_ui_view'> \
   <div> \
@@ -34,10 +32,8 @@ var iconsTemplate =
   </div> \
 </div>"
 
-var _default_df_;
-
 // add opacity property to View
-util.defineClassProperties (vs.ui.View, {
+vs.util.defineClassProperties (vs.ui.View, {
 
   'opacity': {
     set : function (v) {
@@ -55,9 +51,6 @@ var Animations = vs.core.createClass ({
   initComponent : function () {
     this._super ();
 
-    this.dataflow = new DataFlow ();
-    _default_df_ = this.dataflow;
-        
     this.googleView = new vs.ui.View ({
       id:'googleView',
       layout: vs.ui.View.ABSOLUTE_LAYOUT,
@@ -130,38 +123,42 @@ var Animations = vs.core.createClass ({
     var trajScale = new Vector1D ({values: [1, 1.3]}).init ();
     var trajOpacity = new Vector1D ({values: [0, 1]}).init ();
 
-    this.dataflow.connect (this.slider, "value", trajPos, "tick");
-    this.dataflow.connect (this.slider, "value", trajScale, "tick");
-    this.dataflow.connect (this.slider, "value", trajOpacity, "tick");
-    this.dataflow.connect (trajPos, "out", this.logoImageColor, "translation");
-    this.dataflow.connect (trajScale, "out", this.logoImageColor, "scaling");
-    this.dataflow.connect (trajOpacity, "out", this.logoImageColor, "opacity");    
-    
     // Animate Google White logo
     var trajOpacityTer = new Vector1D ({values: [1, 0]}).init ();
-    this.dataflow.connect (this.slider, "value", trajOpacityTer, "tick");
-    this.dataflow.connect (trajPos, "out", this.logoImageWhite, "translation");
-    this.dataflow.connect (trajScale, "out", this.logoImageWhite, "scaling");
-    this.dataflow.connect (trajOpacityTer, "out", this.logoImageWhite, "opacity");    
 
     // Animate search field
     var trajPosBis = new Vector2D ({values: [[0,0], [0, 90]]}).init ();
-    this.dataflow.connect (this.slider, "value", trajPosBis, "tick");
-    this.dataflow.connect (trajPosBis, "out", this.searchInput, "translation");
 
     // Animate short cuts
     var trajOpacityBis = new Vector1D ({values: [0, 1]}).init ();
-    this.dataflow.connect (this.slider, "value", trajOpacityBis, "tick");
-    this.dataflow.connect (trajOpacityBis, "out", this.shortCuts, "opacity");
-   
-    // Animate background image
-    this.dataflow.connect (trajOpacityTer, "out", this.backImage, "opacity");
 
-    // Compile the dataflow
-    this.dataflow.build ();
+    this.slider
+      .connect ("value")
+      .to (trajPos, "tick")
+      .to (trajScale, "tick")
+      .to (trajOpacity, "tick")
+      .to (trajOpacityTer, "tick")
+      .to (trajPosBis, "tick")
+      .to (trajOpacityBis, "tick");
+      
+    trajPos.connect ("out").to (this.logoImageColor, "translation");
+    trajScale.connect ("out").to (this.logoImageColor, "scaling");
+    trajOpacity.connect ("out").to (this.logoImageColor, "opacity");    
     
+    trajPos.connect ("out").to (this.logoImageWhite, "translation");
+    trajScale.connect ("out").to (this.logoImageWhite, "scaling");
+    trajOpacityTer.connect ("out")
+      .to (this.logoImageWhite, "opacity")
+      // Animate background image
+      .to (this.backImage, "opacity");
+
+    trajPosBis.connect ("out").to (this.searchInput, "translation");
+
+    trajOpacityBis.connect ("out").to (this.shortCuts, "opacity");
+   
     // first burst (but should be automatic)
-    this.slider.propagateChange ();
+    var self = this;
+    vs.scheduleAction (function () { self.slider.propagateChange (); });
   },
   
   applicationStarted : function (event) { }
@@ -171,4 +168,7 @@ function loadApplication () {
   new Animations ({id:"animations", layout:vs.ui.View.ABSOLUTE_LAYOUT}).init ();
 
   vs.ui.Application.start ();
+    
+  // Compile the dataflow
+  vs._default_df_.build ();
 }
